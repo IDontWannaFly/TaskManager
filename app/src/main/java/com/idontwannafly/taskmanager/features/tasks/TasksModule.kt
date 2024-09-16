@@ -7,4 +7,5 @@ import org.koin.dsl.module
 val tasksModule = module {
     single { get<AppDatabase>().tasksDao() }
     singleOf(::TasksLocalRepository)
+    singleOf(::TasksUseCase)
 }

@@ -1,6 +1,7 @@
 package com.idontwannafly.taskmanager.features.tasks.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.idontwannafly.taskmanager.features.tasks.db.entities.TaskEntity
@@ -17,5 +18,8 @@ interface TasksDao {
 
     @Insert
     suspend fun insertTask(task: TaskEntity)
+
+    @Delete
+    suspend fun deleteTask(task: TaskEntity)
 
 }
