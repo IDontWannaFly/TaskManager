@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,10 +28,12 @@ import com.idontwannafly.taskmanager.features.tasks.dto.Task
 
 @Composable
 fun TaskItem(
+    modifier: Modifier = Modifier,
     task: Task,
     onItemClicked: (Task) -> Unit = {},
     onDeleteClicked: (Task) -> Unit = {}) = Row(
     modifier = Modifier
+        .then(modifier)
         .fillMaxWidth()
         .height(IntrinsicSize.Min)
         .clickable { onItemClicked(task) },
@@ -39,13 +42,15 @@ fun TaskItem(
     Text(
         modifier = Modifier
             .weight(1f)
-            .padding(horizontal = 10.dp, vertical = 5.dp),
-        text = task.name
+            .padding(vertical = 5.dp)
+            .padding(end = 5.dp),
+        text = task.name,
+        maxLines = 1,
     )
     Text(
         modifier = Modifier
-            .padding(horizontal = 10.dp, vertical = 5.dp)
-            .wrapContentHeight()
+            .padding(vertical = 5.dp)
+            .padding(start = 5.dp)
             .clickable { onDeleteClicked(task) },
         text = stringResource(R.string.remove),
         color = Color.Red,
@@ -55,6 +60,7 @@ fun TaskItem(
 
 @Preview
 @Composable
-fun TaskItemPreview() {
-    TaskItem(Task(name = "Simple name"))
+fun TaskItemPreview() = Surface(
+) {
+    TaskItem(task = Task(name = "Simple name"))
 }

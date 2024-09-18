@@ -22,6 +22,7 @@ class TasksLocalRepository(
 
     suspend fun deleteTask(task: Task) {
         val entity = task.toEntity()
+        dao.deleteTask(entity)
     }
 
 }
