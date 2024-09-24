@@ -1,6 +1,5 @@
 package com.idontwannafly.taskmanager.ui.screens.list
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.idontwannafly.taskmanager.BaseViewModel
 import com.idontwannafly.taskmanager.app.extensions.collect
@@ -22,12 +21,27 @@ class ListViewModel(
     }
 
     private fun observeTasks() {
-        useCase.getTasksFlow().collect(viewModelScope) { _tasksFlow.emit(it) }
+        useCase.getTasksFlow().collect(viewModelScope) { items ->
+            updateTaskIndexes(items)
+            val sortedList = items.sortedBy { it.index }
+            _tasksFlow.emit(sortedList)
+        }
+    }
+
+    private suspend fun updateTaskIndexes(items: List<Task>) {
+        val itemsToUpdate = mutableListOf<Task>()
+        items.forEachIndexed { index, task ->
+            if (index != -1) return@forEachIndexed
+            val indexedTask = task.copy(index = index)
+            itemsToUpdate.add(indexedTask)
+        }
+        useCase.updateTasks(itemsToUpdate)
     }
 
     fun addTask(name: String) {
         viewModelScope.launch {
-            useCase.addTask(name)
+            val index = _tasksFlow.value.size
+            useCase.addTask(name, index)
         }
     }
 
@@ -35,6 +49,10 @@ class ListViewModel(
         viewModelScope.launch {
             useCase.deleteTask(task)
         }
+    }
+
+    fun rearrangeItems(items: List<Task>) {
+
     }
 
 }

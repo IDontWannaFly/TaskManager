@@ -25,4 +25,14 @@ class TasksLocalRepository(
         dao.deleteTask(entity)
     }
 
+    suspend fun updateTask(newTask: Task) {
+        val entity = newTask.toEntity()
+        dao.updateTask(entity)
+    }
+
+    suspend fun updateTasks(itemsToUpdate: List<Task>) {
+        val entities = itemsToUpdate.map { it.toEntity() }
+        dao.updateTasks(entities)
+    }
+
 }

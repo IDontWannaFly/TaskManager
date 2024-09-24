@@ -62,5 +62,5 @@ fun TaskItem(
 @Composable
 fun TaskItemPreview() = Surface(
 ) {
-    TaskItem(task = Task(name = "Simple name"))
+    TaskItem(task = Task(name = "Simple name", index = 0))
 }
