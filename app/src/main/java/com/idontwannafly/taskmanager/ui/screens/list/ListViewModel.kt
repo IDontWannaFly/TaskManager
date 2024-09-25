@@ -1,5 +1,6 @@
 package com.idontwannafly.taskmanager.ui.screens.list
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.idontwannafly.taskmanager.BaseViewModel
 import com.idontwannafly.taskmanager.app.extensions.collect
@@ -13,6 +14,12 @@ class ListViewModel(
     private val useCase: TasksUseCase
 ) : BaseViewModel() {
 
+    companion object {
+        private const val TAG = "ListViewModel"
+    }
+
+    private val tasks = mutableListOf<Task>()
+
     private val _tasksFlow = MutableStateFlow<List<Task>>(listOf())
     val tasksFlow = _tasksFlow.asStateFlow()
 
@@ -24,6 +31,8 @@ class ListViewModel(
         useCase.getTasksFlow().collect(viewModelScope) { items ->
             updateTaskIndexes(items)
             val sortedList = items.sortedBy { it.index }
+            tasks.clear()
+            tasks.addAll(sortedList)
             _tasksFlow.emit(sortedList)
         }
     }
@@ -31,7 +40,8 @@ class ListViewModel(
     private suspend fun updateTaskIndexes(items: List<Task>) {
         val itemsToUpdate = mutableListOf<Task>()
         items.forEachIndexed { index, task ->
-            if (index != -1) return@forEachIndexed
+            if (index == task.index) return@forEachIndexed
+            Log.d(TAG, "Index: $index; Task: $task")
             val indexedTask = task.copy(index = index)
             itemsToUpdate.add(indexedTask)
         }
@@ -51,8 +61,23 @@ class ListViewModel(
         }
     }
 
-    fun rearrangeItems(items: List<Task>) {
+    fun updateItemsIndexes() {
+        viewModelScope.launch {
+            updateTaskIndexes(tasks)
+        }
+    }
 
+    fun moveItem(fromIdx: Int, toIdx: Int) {
+        viewModelScope.launch {
+            val itemFrom = tasks[fromIdx]
+            val itemTo = tasks[toIdx]
+            Log.d(TAG, "Move items: \n" +
+                    "\tFrom: Index - $fromIdx; Item: $itemFrom;\n" +
+                    "\tTo: Index - $toIdx; Item: $itemTo")
+            tasks[fromIdx] = itemTo
+            tasks[toIdx] = itemFrom
+            _tasksFlow.emit(tasks)
+        }
     }
 
 }

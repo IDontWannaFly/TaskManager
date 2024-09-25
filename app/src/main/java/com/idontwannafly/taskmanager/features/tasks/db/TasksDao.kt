@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TasksDao {
 
-    @Query("select * from taskentity order by id")
+    @Query("select * from taskentity order by `index`")
     fun getTasksFlow() : Flow<List<TaskEntity>>
 
     @Query("select * from taskentity")
