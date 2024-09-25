@@ -39,6 +39,7 @@ import androidx.compose.ui.zIndex
 import com.idontwannafly.taskmanager.R
 import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
+import com.idontwannafly.taskmanager.ui.screens.common.Header
 import com.idontwannafly.taskmanager.ui.screens.list.item.TaskItem
 import com.idontwannafly.taskmanager.ui.views.TaskTextField
 import kotlinx.coroutines.flow.combine
@@ -70,18 +71,10 @@ fun ListScreenContent(
 ) = Column(
     Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
 ) {
-    Header()
-    TaskList(items, removeTaskAction, addTaskAction, moveItems, updateItemsIndexes)
-}
-
-@Composable
-fun Header() {
-    Text(
-        modifier = Modifier
-            .fillMaxWidth(),
-        text = stringResource(R.string.tasks_list).uppercase(),
-        textAlign = TextAlign.Center,
+    Header(
+        text = stringResource(R.string.tasks_list)
     )
+    TaskList(items, removeTaskAction, addTaskAction, moveItems, updateItemsIndexes)
 }
 
 @SuppressLint("FlowOperatorInvokedInComposition")

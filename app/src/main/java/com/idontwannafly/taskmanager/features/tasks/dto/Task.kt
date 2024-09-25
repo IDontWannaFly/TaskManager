@@ -17,8 +17,9 @@ data class Task(
     }
 
     fun toEntity() : TaskEntity = TaskEntity(
-        name,
-        index
-    ).also { it.id = id }
+        id = id,
+        name = name,
+        index = index
+    )
 
 }
