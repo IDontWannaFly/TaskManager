@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.idontwannafly.taskmanager.features.tasks.db.entities.TaskEntity
+import com.idontwannafly.taskmanager.features.tasks.dto.Task
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,6 +18,9 @@ interface TasksDao {
 
     @Query("select * from taskentity")
     suspend fun getTasks() : List<TaskEntity>
+
+    @Query("select * from taskentity where id = :taskId limit 1")
+    suspend fun getTask(taskId: Long) : TaskEntity?
 
     @Insert
     suspend fun insertTask(task: TaskEntity)

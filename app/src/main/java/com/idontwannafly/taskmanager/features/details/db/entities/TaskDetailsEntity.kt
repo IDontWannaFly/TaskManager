@@ -19,5 +19,6 @@ import com.idontwannafly.taskmanager.features.tasks.db.entities.TaskEntity
 data class TaskDetailsEntity(
     @PrimaryKey(autoGenerate = false)
     val taskId: Long,
+    val name: String,
     val description: String,
 )

@@ -17,6 +17,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -36,9 +37,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.idontwannafly.taskmanager.LocalNavController
 import com.idontwannafly.taskmanager.R
 import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
+import com.idontwannafly.taskmanager.ui.screens.Screen
 import com.idontwannafly.taskmanager.ui.screens.common.Header
 import com.idontwannafly.taskmanager.ui.screens.list.item.TaskItem
 import com.idontwannafly.taskmanager.ui.views.TaskTextField
@@ -77,7 +80,6 @@ fun ListScreenContent(
     TaskList(items, removeTaskAction, addTaskAction, moveItems, updateItemsIndexes)
 }
 
-@SuppressLint("FlowOperatorInvokedInComposition")
 @Composable
 fun TaskList(
     items: List<Task>,
@@ -86,27 +88,29 @@ fun TaskList(
     moveItems: (fromIdx: Int, toIdx: Int) -> Unit,
     updateItemsIndexes: () -> Unit
 ) {
+    val navController = LocalNavController.current!!
     val listState = rememberLazyListState()
     val position = remember { mutableFloatStateOf(0f) }
     val draggedItem = remember { mutableIntStateOf(-1) }
-    val scope = rememberCoroutineScope()
-    snapshotFlow { listState.layoutInfo }
-        .combine(snapshotFlow { position.floatValue }) { state, pos ->
-            Log.d(TAG, "Position: $pos")
-            if (pos == 0f) return@combine -1
-            val nearestItem =
-                state.visibleItemsInfo.minByOrNull { (pos - (it.offset + it.size / 2f)).absoluteValue }
-            return@combine nearestItem?.index ?: -1
-        }
-        .distinctUntilChanged()
-        .collect(scope) { near ->
-            Log.d(TAG, "Dragged item: ${draggedItem.intValue}; Near: $near")
-            draggedItem.intValue = when {
-                near == -1 -> -1
-                draggedItem.intValue == -1 -> near
-                else -> near.also { moveItems(draggedItem.intValue, near) }
+    LaunchedEffect(key1 = Unit) {
+        snapshotFlow { listState.layoutInfo }
+            .combine(snapshotFlow { position.floatValue }) { state, pos ->
+                Log.d(TAG, "Position: $pos")
+                if (pos == 0f) return@combine -1
+                val nearestItem =
+                    state.visibleItemsInfo.minByOrNull { (pos - (it.offset + it.size / 2f)).absoluteValue }
+                return@combine nearestItem?.index ?: -1
             }
-        }
+            .distinctUntilChanged()
+            .collect { near ->
+                Log.d(TAG, "Dragged item: ${draggedItem.intValue}; Near: $near")
+                draggedItem.intValue = when {
+                    near == -1 -> -1
+                    draggedItem.intValue == -1 -> near
+                    else -> near.also { moveItems(draggedItem.intValue, near) }
+                }
+            }
+    }
     val indexWithOffset by remember {
         derivedStateOf {
             Log.d(TAG, "Dragged item: ${draggedItem.intValue}")
@@ -162,7 +166,10 @@ fun TaskList(
                         translationY = offset ?: 0f
                     },
                 task = task,
-                onDeleteClicked = removeTaskAction
+                onDeleteClicked = removeTaskAction,
+                onItemClicked = {
+                    navController.navigate(Screen.Details.route + "/${it.id}")
+                }
             )
             if (index != items.size - 1) {
                 HorizontalDivider()

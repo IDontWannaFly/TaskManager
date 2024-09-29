@@ -3,4 +3,6 @@
     <string name="tasks_list">Список задач</string>
     <string name="remove">Удалить</string>
     <string name="add_task">Добавить задачу</string>
+    <string name="description">Описание</string>
+    <string name="description_hint">Описание задачи...</string>
 </resources>

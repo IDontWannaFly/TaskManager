@@ -3,7 +3,7 @@ package com.idontwannafly.taskmanager.features.tasks.dto
 import com.idontwannafly.taskmanager.features.tasks.db.entities.TaskEntity
 
 data class Task(
-    private val id: Long? = null,
+    val id: Long? = null,
     val name: String,
     val index: Int
 ) {

@@ -24,4 +24,11 @@ class DetailsViewModel(
         _detailsFlow.emit(details)
     }
 
+    fun updateDetails(details: TaskDetails) {
+        if (details == _detailsFlow.value) return
+        viewModelScope.launch {
+            useCase.updateDetails(details)
+        }
+    }
+
 }
