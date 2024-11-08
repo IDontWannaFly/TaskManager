@@ -12,11 +12,7 @@ import kotlinx.coroutines.launch
 
 class ListViewModel(
     private val useCase: TasksUseCase
-) : BaseViewModel() {
-
-    companion object {
-        private const val TAG = "ListViewModel"
-    }
+) : BaseViewModel<ListContract.State, ListContract.Event, ListContract.Effect>() {
 
     private val tasks = mutableListOf<Task>()
 
@@ -78,6 +74,18 @@ class ListViewModel(
             tasks[toIdx] = itemFrom
             _tasksFlow.emit(tasks)
         }
+    }
+
+    override fun getInitialState(): ListContract.State = ListContract.State(emptyList())
+
+    override suspend fun handleEvent(event: ListContract.Event) {
+        when (event) {
+            else -> Unit
+        }
+    }
+
+    companion object {
+        private const val TAG = "ListViewModel"
     }
 
 }

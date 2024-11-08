@@ -12,13 +12,24 @@ import kotlinx.coroutines.launch
 
 class DetailsViewModel(
     private val useCase: DetailsUseCase
-) : BaseViewModel() {
+) : BaseViewModel<DetailsContract.State, DetailsContract.Event, DetailsContract.Effect>() {
 
     private val _detailsFlow = MutableStateFlow(TaskDetails.empty())
     val detailsFlow = _detailsFlow.asStateFlow()
 
     init {
         collectDetails()
+    }
+
+    override fun getInitialState(): DetailsContract.State = DetailsContract.State(
+        TaskDetails.empty(),
+        false
+    )
+
+    override suspend fun handleEvent(event: DetailsContract.Event) {
+        when (event) {
+            else -> Unit
+        }
     }
 
     private fun collectDetails() {
