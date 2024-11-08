@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 
 abstract class BaseViewModel : ViewModel() {
 
-    private val TAG = javaClass.simpleName
+    protected val TAG = javaClass.simpleName
 
     init {
         Log.d(TAG, "Init")

@@ -5,7 +5,7 @@ import com.idontwannafly.taskmanager.features.tasks.db.entities.TaskEntity
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
 
 data class TaskDetails(
-    private val taskId: Long,
+    val taskId: Long,
     val name: String,
     val description: String
 ) {

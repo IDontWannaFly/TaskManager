@@ -2,12 +2,15 @@ package com.idontwannafly.taskmanager.features.details
 
 import com.idontwannafly.taskmanager.features.details.dto.TaskDetails
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 class DetailsUseCase(
     private val repository: DetailsLocalRepository,
     private val taskId: Long
 ) {
+
+    val detailsFlow = repository.getFlow(taskId)
 
     suspend fun getDetails(): TaskDetails = withContext(Dispatchers.IO) {
         return@withContext repository.getDetails(taskId)

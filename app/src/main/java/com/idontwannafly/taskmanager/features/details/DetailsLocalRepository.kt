@@ -3,13 +3,20 @@ package com.idontwannafly.taskmanager.features.details
 import com.idontwannafly.taskmanager.features.details.db.TaskDetailsDao
 import com.idontwannafly.taskmanager.features.details.dto.TaskDetails
 import com.idontwannafly.taskmanager.features.tasks.db.TasksDao
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class DetailsLocalRepository(
     private val tasksDao: TasksDao,
     private val detailsDao: TaskDetailsDao
 ) {
 
-    suspend fun getDetails(taskId: Long) : TaskDetails {
+    fun getFlow(taskId: Long): Flow<TaskDetails> {
+        return detailsDao.getDetailsFlow(taskId)
+            .map { if (it != null) TaskDetails.fromEntity(it) else createTaskDetails(taskId) }
+    }
+
+    suspend fun getDetails(taskId: Long): TaskDetails {
         val entity = detailsDao.getDetails(taskId)
         val task = entity?.let { TaskDetails.fromEntity(it) } ?: createTaskDetails(taskId)
         return task
