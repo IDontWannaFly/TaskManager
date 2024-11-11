@@ -36,7 +36,9 @@ import androidx.compose.ui.unit.sp
 import com.idontwannafly.taskmanager.R
 import com.idontwannafly.taskmanager.features.details.dto.TaskDetails
 import com.idontwannafly.taskmanager.ui.screens.common.Header
+import com.idontwannafly.taskmanager.ui.screens.list.ListContract
 import com.idontwannafly.taskmanager.ui.views.TaskTextField
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -46,13 +48,13 @@ private const val TAG = "DetailsScreen"
 
 @Composable
 fun DetailsScreen(
-    taskId: Long,
-    viewModel: DetailsViewModel = koinViewModel(parameters = { parametersOf(taskId) })
-) =
-    Surface(modifier = Modifier.fillMaxSize()) {
-        val details by viewModel.detailsFlow.collectAsState()
-        DetailsScreenContent(details, viewModel::updateDetails)
-    }
+    state: DetailsContract.State,
+    effectFlow: Flow<DetailsContract.Effect>,
+    onEventSent: (event: DetailsContract.Event) -> Unit,
+    onNavigationRequested: (navigation: DetailsContract.Effect.Navigation) -> Unit
+) {
+
+}
 
 @Composable
 fun DetailsScreenContent(

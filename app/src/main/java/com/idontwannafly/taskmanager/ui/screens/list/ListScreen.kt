@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import com.idontwannafly.taskmanager.ui.screens.Screen
 import com.idontwannafly.taskmanager.ui.screens.common.Header
 import com.idontwannafly.taskmanager.ui.screens.list.item.TaskItem
 import com.idontwannafly.taskmanager.ui.views.TaskTextField
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.androidx.compose.koinViewModel
@@ -53,15 +56,13 @@ import kotlin.math.absoluteValue
 private const val TAG = "ListScreen"
 
 @Composable
-fun ListScreen(viewModel: ListViewModel = koinViewModel()) = Surface(Modifier.fillMaxSize()) {
-    val items by viewModel.tasksFlow.collectAsState()
-    ListScreenContent(
-        items,
-        viewModel::addTask,
-        viewModel::removeTask,
-        viewModel::moveItem,
-        viewModel::updateItemsIndexes
-    )
+fun ListScreen(
+    state: ListContract.State,
+    effectFlow: Flow<ListContract.Effect>,
+    onEventSent: (event: ListContract.Event) -> Unit,
+    onNavigationRequested: (navigation: ListContract.Effect.Navigation) -> Unit
+) {
+
 }
 
 @Composable

@@ -14,6 +14,10 @@ class DetailsContract {
         val isLoading: Boolean
     ) : ViewState
 
-    sealed class Effect : ViewEffect
+    sealed class Effect : ViewEffect {
+        sealed class Navigation : Effect() {
+            data object ToList : Navigation()
+        }
+    }
 
 }

@@ -13,6 +13,10 @@ class ListContract {
         val tasks: List<Task>
     ) : ViewState
 
-    sealed class Effect : ViewEffect
+    sealed class Effect : ViewEffect {
+        sealed class Navigation : Effect() {
+            class ToDetails(val taskId: String) : Navigation()
+        }
+    }
 
 }
