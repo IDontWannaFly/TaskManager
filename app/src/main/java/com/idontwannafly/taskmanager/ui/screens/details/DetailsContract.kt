@@ -1,8 +1,8 @@
 package com.idontwannafly.taskmanager.ui.screens.details
 
-import com.idontwannafly.taskmanager.ViewEffect
-import com.idontwannafly.taskmanager.ViewEvent
-import com.idontwannafly.taskmanager.ViewState
+import com.idontwannafly.taskmanager.ui.base.ViewEffect
+import com.idontwannafly.taskmanager.ui.base.ViewEvent
+import com.idontwannafly.taskmanager.ui.base.ViewState
 import com.idontwannafly.taskmanager.features.details.dto.TaskDetails
 
 class DetailsContract {

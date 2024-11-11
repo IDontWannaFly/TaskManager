@@ -1,7 +1,7 @@
 package com.idontwannafly.taskmanager.ui.screens.details
 
 import androidx.lifecycle.viewModelScope
-import com.idontwannafly.taskmanager.BaseViewModel
+import com.idontwannafly.taskmanager.ui.base.BaseViewModel
 import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.details.DetailsUseCase
 import com.idontwannafly.taskmanager.features.details.dto.TaskDetails

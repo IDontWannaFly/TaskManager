@@ -1,7 +1,6 @@
-package com.idontwannafly.taskmanager
+package com.idontwannafly.taskmanager.ui.base
 
 import android.util.Log
-import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel

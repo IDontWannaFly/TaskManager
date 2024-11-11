@@ -2,7 +2,7 @@ package com.idontwannafly.taskmanager.ui.screens.list
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.idontwannafly.taskmanager.BaseViewModel
+import com.idontwannafly.taskmanager.ui.base.BaseViewModel
 import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.tasks.TasksUseCase
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
