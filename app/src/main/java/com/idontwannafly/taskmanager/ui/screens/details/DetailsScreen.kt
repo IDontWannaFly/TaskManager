@@ -3,6 +3,7 @@ package com.idontwannafly.taskmanager.ui.screens.details
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
@@ -67,7 +72,11 @@ fun DetailsScreen(
         topBar = {
             Box {
                 Header(
-                    text = state.details.name
+                    text = state.details.name,
+                    onBackPressed = {
+                        val navigation = DetailsContract.Effect.Navigation.ToList
+                        onNavigationRequested(navigation)
+                    }
                 )
                 if (!state.isLoading) return@Box
                 CircularProgressIndicator(
