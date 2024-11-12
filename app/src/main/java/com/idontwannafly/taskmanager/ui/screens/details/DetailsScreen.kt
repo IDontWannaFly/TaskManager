@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.idontwannafly.taskmanager.R
 import com.idontwannafly.taskmanager.features.details.dto.TaskDetails
 import com.idontwannafly.taskmanager.ui.base.SIDE_EFFECTS_KEY
+import com.idontwannafly.taskmanager.ui.extensions.debouncedClick
 import com.idontwannafly.taskmanager.ui.screens.common.Header
 import com.idontwannafly.taskmanager.ui.screens.list.ListContract
 import com.idontwannafly.taskmanager.ui.views.TaskTextField
@@ -73,9 +74,9 @@ fun DetailsScreen(
             Box {
                 Header(
                     text = state.details.name,
-                    onBackPressed = {
-                        val navigation = DetailsContract.Effect.Navigation.ToList
-                        onNavigationRequested(navigation)
+                    onBackPressed = debouncedClick {
+                        val event = DetailsContract.Event.NavigateToList
+                        onEventSent(event)
                     }
                 )
                 if (!state.isLoading) return@Box

@@ -12,6 +12,7 @@ class ListContract {
         data class AddTask(val name: String) : Event()
         data class MoveItems(val fromIdx: Int, val toIdx: Int) : Event()
         data object UpdateItemsIndexes : Event()
+        data class SelectTask(val task: Task) : Event()
     }
 
     data class State(

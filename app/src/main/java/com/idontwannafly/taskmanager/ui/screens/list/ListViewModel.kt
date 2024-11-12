@@ -6,8 +6,6 @@ import com.idontwannafly.taskmanager.ui.base.BaseViewModel
 import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.tasks.TasksUseCase
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ListViewModel(
@@ -76,9 +74,8 @@ class ListViewModel(
         }
     }
 
-    private suspend fun updateTasksList(list: List<Task>) {
-        val state = ListContract.State(list)
-        postState(state)
+    private fun updateTasksList(list: List<Task>) {
+        setState { copy(tasks = list) }
     }
 
     override fun provideInitialState(): ListContract.State = ListContract.State(emptyList())
@@ -88,7 +85,8 @@ class ListViewModel(
             is ListContract.Event.AddTask -> addTask(event.name)
             is ListContract.Event.MoveItems -> moveItem(event.fromIdx, event.toIdx)
             is ListContract.Event.RemoveTask -> removeTask(event.task)
-            ListContract.Event.UpdateItemsIndexes -> updateItemsIndexes()
+            is ListContract.Event.UpdateItemsIndexes -> updateItemsIndexes()
+            is ListContract.Event.SelectTask -> setEffect { ListContract.Effect.Navigation.ToDetails(event.task.id.toString()) }
         }
     }
 

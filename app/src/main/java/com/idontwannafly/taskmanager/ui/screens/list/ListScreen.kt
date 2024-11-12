@@ -75,7 +75,7 @@ fun ListScreen(
 
             else -> TaskList(
                 Modifier.padding(pv),
-                state.tasks, onEventSent, onNavigationRequested
+                state.tasks, onEventSent
             )
         }
     }
@@ -99,8 +99,7 @@ fun EmptyListScreen(
 fun TaskList(
     modifier: Modifier,
     items: List<Task>,
-    onEventSent: (event: ListContract.Event) -> Unit,
-    onNavigationRequested: (navigation: ListContract.Effect.Navigation) -> Unit
+    onEventSent: (event: ListContract.Event) -> Unit
 ) {
     val listState = rememberLazyListState()
     val position = remember { mutableFloatStateOf(0f) }
@@ -189,8 +188,8 @@ fun TaskList(
                     onEventSent(event)
                 },
                 onItemClicked = {
-                    val navigation = ListContract.Effect.Navigation.ToDetails(it.id.toString())
-                    onNavigationRequested(navigation)
+                    val event = ListContract.Event.SelectTask(it)
+                    onEventSent(event)
                 }
             )
             if (index != items.size - 1) {

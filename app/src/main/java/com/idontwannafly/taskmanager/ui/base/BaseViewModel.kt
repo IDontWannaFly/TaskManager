@@ -41,8 +41,14 @@ abstract class BaseViewModel<State : ViewState, Event : ViewEvent, Effect : View
         viewModelScope.launch { handleEvent(event) }
     }
 
-    protected suspend fun postState(state: State) {
-        _viewState.emit(state)
+    protected fun setState(reducer: State.() -> State) {
+        val newState = viewState.value.reducer()
+        _viewState.value = newState
+    }
+
+    protected fun setEffect(builder: () -> Effect) {
+        val effectValue = builder()
+        viewModelScope.launch { _effect.send(effectValue) }
     }
 
     override fun onCleared() {

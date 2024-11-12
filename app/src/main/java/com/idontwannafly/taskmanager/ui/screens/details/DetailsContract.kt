@@ -9,6 +9,7 @@ class DetailsContract {
 
     sealed class Event : ViewEvent {
         data class UpdateDetails(val details: TaskDetails) : Event()
+        data object NavigateToList : Event()
     }
 
     data class State(

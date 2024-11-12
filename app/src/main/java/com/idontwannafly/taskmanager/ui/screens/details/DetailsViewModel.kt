@@ -5,9 +5,6 @@ import com.idontwannafly.taskmanager.ui.base.BaseViewModel
 import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.details.DetailsUseCase
 import com.idontwannafly.taskmanager.features.details.dto.TaskDetails
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class DetailsViewModel(
@@ -29,6 +26,7 @@ class DetailsViewModel(
     override suspend fun handleEvent(event: DetailsContract.Event) {
         when (event) {
             is DetailsContract.Event.UpdateDetails -> updateDetails(event.details)
+            is DetailsContract.Event.NavigateToList -> setEffect { DetailsContract.Effect.Navigation.ToList }
         }
     }
 
@@ -47,14 +45,12 @@ class DetailsViewModel(
         }
     }
 
-    private suspend fun setDetails(details: TaskDetails) {
-        val state = viewState.value.copy(details = details)
-        postState(state)
+    private fun setDetails(details: TaskDetails) {
+        setState { copy(details = details) }
     }
 
-    private suspend fun setLoading(value: Boolean) {
-        val state = viewState.value.copy(isLoading = value)
-        postState(state)
+    private fun setLoading(value: Boolean) {
+        setState { copy(isLoading = value) }
     }
 
 }
