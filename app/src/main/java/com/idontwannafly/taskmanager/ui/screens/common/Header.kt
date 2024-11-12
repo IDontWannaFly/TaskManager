@@ -1,9 +1,13 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.idontwannafly.taskmanager.ui.screens.common
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -17,13 +21,15 @@ fun Header(
     modifier: Modifier = Modifier,
     text: String = "",
     fontSize: TextUnit = 20.sp
-) {
-    Text(
-        modifier = Modifier.fillMaxWidth()
-            .then(modifier),
-        text = text,
-        textAlign = TextAlign.Center,
-        fontSize = fontSize,
-        style = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)
-    )
-}
+) = TopAppBar(
+    title = {
+        Text(
+            modifier = Modifier.fillMaxWidth()
+                .then(modifier),
+            text = text,
+            textAlign = TextAlign.Center,
+            fontSize = fontSize,
+            style = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)
+        )
+    }
+)

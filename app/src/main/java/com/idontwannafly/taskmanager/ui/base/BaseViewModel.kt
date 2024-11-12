@@ -20,10 +20,10 @@ const val SIDE_EFFECTS_KEY = "SideEffectsKey"
 abstract class BaseViewModel<State : ViewState, Event : ViewEvent, Effect : ViewEffect> :
     ViewModel() {
 
-    protected abstract fun getInitialState(): State
+    protected abstract fun provideInitialState(): State
     protected abstract suspend fun handleEvent(event: Event)
 
-    private val initialState by lazy { getInitialState() }
+    private val initialState by lazy { provideInitialState() }
 
     private val _viewState = MutableStateFlow(initialState)
     val viewState = _viewState.asStateFlow()
@@ -39,6 +39,10 @@ abstract class BaseViewModel<State : ViewState, Event : ViewEvent, Effect : View
 
     fun postEvent(event: Event) {
         viewModelScope.launch { handleEvent(event) }
+    }
+
+    protected suspend fun postState(state: State) {
+        _viewState.emit(state)
     }
 
     override fun onCleared() {

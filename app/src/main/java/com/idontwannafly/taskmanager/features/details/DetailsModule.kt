@@ -8,6 +8,6 @@ import org.koin.dsl.module
 val detailsModule = module {
     factoryOf(::DetailsLocalRepository)
 
-    factory { DetailsUseCase(get(), it.get()) }
+    factory { DetailsUseCase(get(), it.get<String>().toLong()) }
     single { get<AppDatabase>().taskDetailsDao() }
 }

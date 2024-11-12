@@ -7,7 +7,12 @@ import com.idontwannafly.taskmanager.features.tasks.dto.Task
 
 class ListContract {
 
-    sealed class Event : ViewEvent
+    sealed class Event : ViewEvent {
+        data class RemoveTask(val task: Task) : Event()
+        data class AddTask(val name: String) : Event()
+        data class MoveItems(val fromIdx: Int, val toIdx: Int) : Event()
+        data object UpdateItemsIndexes : Event()
+    }
 
     data class State(
         val tasks: List<Task>

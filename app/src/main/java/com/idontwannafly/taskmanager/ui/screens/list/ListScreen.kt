@@ -43,6 +43,7 @@ import com.idontwannafly.taskmanager.LocalNavController
 import com.idontwannafly.taskmanager.R
 import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
+import com.idontwannafly.taskmanager.ui.base.SIDE_EFFECTS_KEY
 import com.idontwannafly.taskmanager.ui.screens.Screen
 import com.idontwannafly.taskmanager.ui.screens.common.Header
 import com.idontwannafly.taskmanager.ui.screens.list.item.TaskItem
@@ -50,6 +51,7 @@ import com.idontwannafly.taskmanager.ui.views.TaskTextField
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.absoluteValue
 
@@ -62,34 +64,55 @@ fun ListScreen(
     onEventSent: (event: ListContract.Event) -> Unit,
     onNavigationRequested: (navigation: ListContract.Effect.Navigation) -> Unit
 ) {
+    LaunchedEffect(SIDE_EFFECTS_KEY) {
+        effectFlow.collect {
+            when (it) {
+                is ListContract.Effect.Navigation.ToDetails -> onNavigationRequested(it)
+            }
+        }
+    }
+    Scaffold(
+        topBar = {
+            Header(
+                text = stringResource(R.string.tasks_list)
+            )
+        }
+    ) { pv ->
+        when {
+            state.tasks.isEmpty() -> EmptyListScreen(
+                Modifier.padding(pv),
+                onEventSent
+            )
 
+            else -> TaskList(
+                Modifier.padding(pv),
+                state.tasks, onEventSent, onNavigationRequested
+            )
+        }
+    }
 }
 
 @Composable
-fun ListScreenContent(
-    items: List<Task>,
-    addTaskAction: (name: String) -> Unit,
-    removeTaskAction: (Task) -> Unit,
-    moveItems: (fromIdx: Int, toIdx: Int) -> Unit,
-    updateItemsIndexes: () -> Unit
+fun EmptyListScreen(
+    modifier: Modifier,
+    onEventSent: (event: ListContract.Event) -> Unit
 ) = Column(
-    Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
+    modifier = Modifier.then(modifier)
+        .padding(horizontal = 15.dp)
 ) {
-    Header(
-        text = stringResource(R.string.tasks_list)
-    )
-    TaskList(items, removeTaskAction, addTaskAction, moveItems, updateItemsIndexes)
+    TaskFiller{ name ->
+        val event = ListContract.Event.AddTask(name)
+        onEventSent(event)
+    }
 }
 
 @Composable
 fun TaskList(
+    modifier: Modifier,
     items: List<Task>,
-    removeTaskAction: (Task) -> Unit,
-    addTaskAction: (name: String) -> Unit,
-    moveItems: (fromIdx: Int, toIdx: Int) -> Unit,
-    updateItemsIndexes: () -> Unit
+    onEventSent: (event: ListContract.Event) -> Unit,
+    onNavigationRequested: (navigation: ListContract.Effect.Navigation) -> Unit
 ) {
-    val navController = LocalNavController.current!!
     val listState = rememberLazyListState()
     val position = remember { mutableFloatStateOf(0f) }
     val draggedItem = remember { mutableIntStateOf(-1) }
@@ -108,7 +131,10 @@ fun TaskList(
                 draggedItem.intValue = when {
                     near == -1 -> -1
                     draggedItem.intValue == -1 -> near
-                    else -> near.also { moveItems(draggedItem.intValue, near) }
+                    else -> near.also {
+                        val event = ListContract.Event.MoveItems(draggedItem.intValue, near)
+                        onEventSent(event)
+                    }
                 }
             }
     }
@@ -128,8 +154,9 @@ fun TaskList(
     LazyColumn(
         state = listState,
         modifier = Modifier
+            .then(modifier)
             .fillMaxSize()
-            .padding(vertical = 10.dp)
+            .padding(vertical = 10.dp, horizontal = 15.dp)
             .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
@@ -149,7 +176,8 @@ fun TaskList(
                     },
                     onDragEnd = {
                         Log.d(TAG, "onDragEnd")
-                        updateItemsIndexes()
+                        val event = ListContract.Event.UpdateItemsIndexes
+                        onEventSent(event)
                         draggedItem.intValue = -1
                         position.floatValue = 0f
                     }
@@ -167,9 +195,13 @@ fun TaskList(
                         translationY = offset ?: 0f
                     },
                 task = task,
-                onDeleteClicked = removeTaskAction,
+                onDeleteClicked = { taskToDelete ->
+                    val event = ListContract.Event.RemoveTask(taskToDelete)
+                    onEventSent(event)
+                },
                 onItemClicked = {
-                    navController.navigate(Screen.Details.route + "/${it.id}")
+                    val navigation = ListContract.Effect.Navigation.ToDetails(it.id.toString())
+                    onNavigationRequested(navigation)
                 }
             )
             if (index != items.size - 1) {
@@ -180,7 +212,10 @@ fun TaskList(
         item {
             TaskFiller(
                 modifier = Modifier,
-                addTaskAction = addTaskAction
+                addTaskAction = { name ->
+                    val event = ListContract.Event.AddTask(name)
+                    onEventSent(event)
+                }
             )
         }
     }
@@ -205,13 +240,22 @@ fun TaskFiller(modifier: Modifier = Modifier, addTaskAction: (name: String) -> U
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListScreenPreview() = Surface(Modifier.fillMaxSize()) {
-    val items = remember {
-        mutableStateOf(
-            listOf(
-                Task(name = "Simple task", index = 0),
-                Task(name = "Second task", index = 1)
-            )
-        )
-    }
-    ListScreenContent(items.value.toMutableList(), {}, {}, { _, _ -> }, {})
+    val items = listOf(
+        Task(name = "Simple task", index = 0),
+        Task(name = "Second task", index = 1)
+    )
+    ListScreen(
+        ListContract.State(items),
+        flowOf(),
+        {},
+        {}
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun EmptyScreenPreview() = Surface(Modifier.fillMaxSize()) {
+    EmptyListScreen(
+        Modifier
+    ) { }
 }

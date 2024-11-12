@@ -16,8 +16,8 @@ class ListViewModel(
 
     private val tasks = mutableListOf<Task>()
 
-    private val _tasksFlow = MutableStateFlow<List<Task>>(listOf())
-    val tasksFlow = _tasksFlow.asStateFlow()
+    private val tasksList: List<Task>
+        get() = viewState.value.tasks
 
     init {
         observeTasks()
@@ -29,7 +29,7 @@ class ListViewModel(
             val sortedList = items.sortedBy { it.index }
             tasks.clear()
             tasks.addAll(sortedList)
-            _tasksFlow.emit(sortedList)
+            updateTasksList(sortedList)
         }
     }
 
@@ -44,26 +44,26 @@ class ListViewModel(
         useCase.updateTasks(itemsToUpdate)
     }
 
-    fun addTask(name: String) {
+    private fun addTask(name: String) {
         viewModelScope.launch {
-            val index = _tasksFlow.value.size
+            val index = tasksList.size
             useCase.addTask(name, index)
         }
     }
 
-    fun removeTask(task: Task) {
+    private fun removeTask(task: Task) {
         viewModelScope.launch {
             useCase.deleteTask(task)
         }
     }
 
-    fun updateItemsIndexes() {
+    private fun updateItemsIndexes() {
         viewModelScope.launch {
             updateTaskIndexes(tasks)
         }
     }
 
-    fun moveItem(fromIdx: Int, toIdx: Int) {
+    private fun moveItem(fromIdx: Int, toIdx: Int) {
         viewModelScope.launch {
             val itemFrom = tasks[fromIdx]
             val itemTo = tasks[toIdx]
@@ -72,15 +72,23 @@ class ListViewModel(
                     "\tTo: Index - $toIdx; Item: $itemTo")
             tasks[fromIdx] = itemTo
             tasks[toIdx] = itemFrom
-            _tasksFlow.emit(tasks)
+            updateTasksList(tasks)
         }
     }
 
-    override fun getInitialState(): ListContract.State = ListContract.State(emptyList())
+    private suspend fun updateTasksList(list: List<Task>) {
+        val state = ListContract.State(list)
+        postState(state)
+    }
+
+    override fun provideInitialState(): ListContract.State = ListContract.State(emptyList())
 
     override suspend fun handleEvent(event: ListContract.Event) {
         when (event) {
-            else -> Unit
+            is ListContract.Event.AddTask -> addTask(event.name)
+            is ListContract.Event.MoveItems -> moveItem(event.fromIdx, event.toIdx)
+            is ListContract.Event.RemoveTask -> removeTask(event.task)
+            ListContract.Event.UpdateItemsIndexes -> updateItemsIndexes()
         }
     }
 

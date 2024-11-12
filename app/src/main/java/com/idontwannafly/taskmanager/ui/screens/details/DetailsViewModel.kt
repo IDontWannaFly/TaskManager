@@ -21,7 +21,7 @@ class DetailsViewModel(
         collectDetails()
     }
 
-    override fun getInitialState(): DetailsContract.State = DetailsContract.State(
+    override fun provideInitialState(): DetailsContract.State = DetailsContract.State(
         TaskDetails.empty(),
         false
     )
