@@ -1,6 +1,5 @@
 package com.idontwannafly.taskmanager.ui.screens.list
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Column
@@ -15,36 +14,27 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.idontwannafly.taskmanager.LocalNavController
 import com.idontwannafly.taskmanager.R
-import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
 import com.idontwannafly.taskmanager.ui.base.SIDE_EFFECTS_KEY
-import com.idontwannafly.taskmanager.ui.screens.Screen
 import com.idontwannafly.taskmanager.ui.screens.common.Header
 import com.idontwannafly.taskmanager.ui.screens.list.item.TaskItem
 import com.idontwannafly.taskmanager.ui.views.TaskTextField
@@ -52,7 +42,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
-import org.koin.androidx.compose.koinViewModel
 import kotlin.math.absoluteValue
 
 private const val TAG = "ListScreen"

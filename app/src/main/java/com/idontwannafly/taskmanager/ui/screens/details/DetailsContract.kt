@@ -7,7 +7,9 @@ import com.idontwannafly.taskmanager.features.details.dto.TaskDetails
 
 class DetailsContract {
 
-    sealed class Event : ViewEvent
+    sealed class Event : ViewEvent {
+        data class UpdateDetails(val details: TaskDetails) : Event()
+    }
 
     data class State(
         val details: TaskDetails,

@@ -14,8 +14,8 @@ class DetailsViewModel(
     private val useCase: DetailsUseCase
 ) : BaseViewModel<DetailsContract.State, DetailsContract.Event, DetailsContract.Effect>() {
 
-    private val _detailsFlow = MutableStateFlow(TaskDetails.empty())
-    val detailsFlow = _detailsFlow.asStateFlow()
+    private val currentDetails: TaskDetails
+        get() = viewState.value.details
 
     init {
         collectDetails()
@@ -28,22 +28,33 @@ class DetailsViewModel(
 
     override suspend fun handleEvent(event: DetailsContract.Event) {
         when (event) {
-            else -> Unit
+            is DetailsContract.Event.UpdateDetails -> updateDetails(event.details)
         }
     }
 
     private fun collectDetails() {
         useCase.detailsFlow.collect(viewModelScope) {
-            _detailsFlow.emit(it)
+            setDetails(it)
+            setLoading(false)
         }
     }
 
-    fun updateDetails(details: TaskDetails) {
-        if (details == _detailsFlow.value) return
+    private fun updateDetails(details: TaskDetails) {
+        if (details == currentDetails) return
         viewModelScope.launch {
-            delay(1000L)
+            setLoading(true)
             useCase.updateDetails(details)
         }
+    }
+
+    private suspend fun setDetails(details: TaskDetails) {
+        val state = viewState.value.copy(details = details)
+        postState(state)
+    }
+
+    private suspend fun setLoading(value: Boolean) {
+        val state = viewState.value.copy(isLoading = value)
+        postState(state)
     }
 
 }

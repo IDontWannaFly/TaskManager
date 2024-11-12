@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,15 +36,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.idontwannafly.taskmanager.R
 import com.idontwannafly.taskmanager.features.details.dto.TaskDetails
+import com.idontwannafly.taskmanager.ui.base.SIDE_EFFECTS_KEY
 import com.idontwannafly.taskmanager.ui.screens.common.Header
 import com.idontwannafly.taskmanager.ui.screens.list.ListContract
 import com.idontwannafly.taskmanager.ui.views.TaskTextField
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-const val ARGUMENT_TASK_ID = "taskId"
 private const val TAG = "DetailsScreen"
 
 @Composable
@@ -53,15 +55,50 @@ fun DetailsScreen(
     onEventSent: (event: DetailsContract.Event) -> Unit,
     onNavigationRequested: (navigation: DetailsContract.Effect.Navigation) -> Unit
 ) {
+    LaunchedEffect(SIDE_EFFECTS_KEY) {
+        effectFlow.collect {
+            when (it) {
+                is DetailsContract.Effect.Navigation.ToList -> onNavigationRequested(it)
+            }
+        }
+    }
 
+    Scaffold(
+        topBar = {
+            Box {
+                Header(
+                    text = state.details.name
+                )
+                if (!state.isLoading) return@Box
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(24.dp)
+                        .align(Alignment.CenterEnd)
+                )
+            }
+        }
+    ) { pv ->
+        DetailsScreenContent(
+            modifier = Modifier.padding(pv),
+            details = state.details,
+            updateDetailsAction = { details ->
+                val event = DetailsContract.Event.UpdateDetails(details)
+                onEventSent(event)
+            }
+        )
+    }
 }
 
 @Composable
 fun DetailsScreenContent(
+    modifier: Modifier,
     details: TaskDetails,
     updateDetailsAction: (details: TaskDetails) -> Unit
 ) = Column(
-    modifier = Modifier.padding(horizontal = 15.dp)
+    modifier = Modifier
+        .then(modifier)
+        .padding(horizontal = 15.dp)
 ) {
     Log.d(TAG, "Details")
     val isUpdating = remember {
@@ -79,19 +116,6 @@ fun DetailsScreenContent(
                 )
             )
         }
-    }
-    Box {
-        Header(
-            modifier = Modifier.padding(vertical = 15.dp),
-            text = details.name
-        )
-        if (!isUpdating.value) return@Box
-        CircularProgressIndicator(
-            modifier = Modifier
-                .width(24.dp)
-                .height(24.dp)
-                .align(Alignment.CenterEnd)
-        )
     }
     Text(
         modifier = Modifier.padding(bottom = 5.dp),
@@ -114,5 +138,11 @@ fun DetailsScreenContent(
 @Preview
 @Composable
 fun DetailsScreenPreview() = Surface(Modifier.fillMaxSize()) {
-    DetailsScreenContent(TaskDetails.mock(), {})
+    val state = DetailsContract.State(TaskDetails.mock(), false)
+    DetailsScreen(
+        state,
+        flowOf(),
+        {},
+        {}
+    )
 }
