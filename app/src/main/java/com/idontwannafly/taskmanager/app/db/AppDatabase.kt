@@ -12,7 +12,7 @@ import com.idontwannafly.taskmanager.features.tasks.db.entities.TaskEntity
         TaskEntity::class,
         TaskDetailsEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

@@ -9,10 +9,12 @@ class ListContract {
 
     sealed class Event : ViewEvent {
         data class RemoveTask(val task: Task) : Event()
-        data class AddTask(val name: String) : Event()
+        data class AddTask(val parentId: Long?, val name: String) : Event()
         data class MoveItems(val fromIdx: Int, val toIdx: Int) : Event()
         data object UpdateItemsIndexes : Event()
         data class SelectTask(val task: Task) : Event()
+        data class GetSubtasks(val parentTask: Task) : Event()
+        data class ClearSubtasks(val parentTask: Task) : Event()
     }
 
     data class State(

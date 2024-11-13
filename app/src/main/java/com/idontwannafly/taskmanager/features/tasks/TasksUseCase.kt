@@ -9,11 +9,11 @@ class TasksUseCase(
     private val repository: TasksLocalRepository
 ) {
 
-    fun getTasksFlow(): Flow<List<Task>> = repository.getFlow()
+    fun getTasksFlow(parentId: Long? = null): Flow<List<Task>> = repository.getFlow(parentId)
 
-    suspend fun addTask(name: String, index: Int) = withContext(Dispatchers.IO) {
+    suspend fun addTask(parentId: Long?, name: String, index: Int) = withContext(Dispatchers.IO) {
         val task = Task(name = name, index = index)
-        repository.addTask(task)
+        repository.addTask(parentId, task)
     }
 
     suspend fun deleteTask(task: Task) = withContext(Dispatchers.IO) {

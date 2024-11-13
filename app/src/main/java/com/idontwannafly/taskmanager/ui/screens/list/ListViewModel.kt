@@ -6,6 +6,10 @@ import com.idontwannafly.taskmanager.ui.base.BaseViewModel
 import com.idontwannafly.taskmanager.app.extensions.collect
 import com.idontwannafly.taskmanager.features.tasks.TasksUseCase
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class ListViewModel(
@@ -16,6 +20,8 @@ class ListViewModel(
 
     private val tasksList: List<Task>
         get() = viewState.value.tasks
+
+    private val subTasksCollections = mutableMapOf<Long, Job>()
 
     init {
         observeTasks()
@@ -42,10 +48,10 @@ class ListViewModel(
         useCase.updateTasks(itemsToUpdate)
     }
 
-    private fun addTask(name: String) {
+    private fun addTask(parentId: Long?, name: String) {
         viewModelScope.launch {
             val index = tasksList.size
-            useCase.addTask(name, index)
+            useCase.addTask(parentId, name, index)
         }
     }
 
@@ -82,16 +88,36 @@ class ListViewModel(
 
     override suspend fun handleEvent(event: ListContract.Event) {
         when (event) {
-            is ListContract.Event.AddTask -> addTask(event.name)
+            is ListContract.Event.AddTask -> addTask(event.parentId, event.name)
             is ListContract.Event.MoveItems -> moveItem(event.fromIdx, event.toIdx)
             is ListContract.Event.RemoveTask -> removeTask(event.task)
             is ListContract.Event.UpdateItemsIndexes -> updateItemsIndexes()
             is ListContract.Event.SelectTask -> setEffect { ListContract.Effect.Navigation.ToDetails(event.task.id.toString()) }
+            is ListContract.Event.ClearSubtasks -> clearSubtasks(event.parentTask)
+            is ListContract.Event.GetSubtasks -> getSubtasks(event.parentTask)
         }
     }
 
-    companion object {
-        private const val TAG = "ListViewModel"
+    private fun getSubtasks(parentTask: Task) {
+        val parentIndex = tasks.indexOf(parentTask)
+        val job = viewModelScope.launch {
+            useCase.getTasksFlow(parentTask.id).collect {
+                updateTask(parentIndex, parentTask.copy(subTasks = it))
+            }
+        }
+        subTasksCollections[parentTask.id!!] = job
+    }
+
+    private fun clearSubtasks(parentTask: Task) {
+        val parentIndex = tasks.indexOf(parentTask)
+        subTasksCollections[parentTask.id!!]?.cancel()
+        subTasksCollections.remove(parentTask.id)
+        updateTask(parentIndex, parentTask.copy(subTasks = emptyList()))
+    }
+
+    private fun updateTask(index: Int, taskToUpdate: Task) {
+        tasks[index] = taskToUpdate
+        updateTasksList(tasks)
     }
 
 }

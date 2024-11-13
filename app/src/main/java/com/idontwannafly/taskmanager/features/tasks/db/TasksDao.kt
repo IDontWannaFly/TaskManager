@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.idontwannafly.taskmanager.features.tasks.db.dto.TaskUpdateQuery
 import com.idontwannafly.taskmanager.features.tasks.db.entities.TaskEntity
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
 import kotlinx.coroutines.flow.Flow
@@ -13,11 +14,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TasksDao {
 
-    @Query("select * from taskentity order by `index`")
-    fun getTasksFlow() : Flow<List<TaskEntity>>
-
-    @Query("select * from taskentity")
-    suspend fun getTasks() : List<TaskEntity>
+    @Query("select * from taskentity where parentId is :parentId order by `index`")
+    fun getTasksFlow(parentId: Long? = null) : Flow<List<TaskEntity>>
 
     @Query("select * from taskentity where id = :taskId limit 1")
     suspend fun getTask(taskId: Long) : TaskEntity?
@@ -28,10 +26,14 @@ interface TasksDao {
     @Delete
     suspend fun deleteTask(task: TaskEntity)
 
-    @Update
-    suspend fun updateTask(entity: TaskEntity)
+    @Update(
+        entity = TaskEntity::class
+    )
+    suspend fun updateTask(query: TaskUpdateQuery)
 
-    @Update
-    suspend fun updateTasks(entities: List<TaskEntity>)
+    @Update(
+        entity = TaskEntity::class
+    )
+    suspend fun updateTasks(queries: List<TaskUpdateQuery>)
 
 }
