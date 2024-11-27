@@ -96,10 +96,6 @@ fun TasksList(
                     },
                     onDrag = { pic, offset ->
                         pic.consume()
-                        if (position.floatValue > (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.offset ?: 0)) {
-                            position.floatValue = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.offset?.toFloat() ?: position.floatValue
-                            return@detectDragGesturesAfterLongPress
-                        }
                         position.floatValue += offset.y
                     },
                     onDragEnd = {
