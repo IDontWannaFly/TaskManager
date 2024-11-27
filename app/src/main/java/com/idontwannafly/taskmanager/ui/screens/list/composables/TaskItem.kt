@@ -56,7 +56,7 @@ fun TaskItem(
         contentDescription = null,
         modifier = Modifier
             .clickable { onExpanded(!expanded) }
-            .padding(15.dp)
+            .padding(5.dp)
             .width(24.dp)
             .height(24.dp)
     )
@@ -70,9 +70,8 @@ fun TaskItem(
     )
     Text(
         modifier = Modifier
-            .padding(vertical = 5.dp)
-            .padding(start = 5.dp)
-            .clickable { onDeleteClicked(task) },
+            .clickable { onDeleteClicked(task) }
+            .padding(vertical = 5.dp, horizontal = 5.dp),
         text = stringResource(R.string.remove),
         color = Color.Red,
         textAlign = TextAlign.Center

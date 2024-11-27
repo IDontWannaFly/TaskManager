@@ -109,8 +109,6 @@ fun ListScreenPreview() = Surface(Modifier.fillMaxSize()) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun EmptyScreenPreview() = Surface(Modifier.fillMaxSize()) {
-    EmptyListScreen(
-        Modifier
-    ) { }
+fun EmptyScreenPreview() {
+    ListScreen(ListContract.State(emptyList()), flowOf(), {}, {})
 }

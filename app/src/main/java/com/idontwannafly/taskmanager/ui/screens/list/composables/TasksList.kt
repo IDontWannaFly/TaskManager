@@ -1,6 +1,7 @@
 package com.idontwannafly.taskmanager.ui.screens.list.composables
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,15 +9,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -102,8 +107,15 @@ fun TasksList(
             val offset by remember {
                 derivedStateOf { indexWithOffset?.takeIf { it.first == index }?.second }
             }
+            val isOdd by remember {
+                mutableStateOf(index % 2 == 0)
+            }
             TaskItem(
                 modifier = Modifier
+                    .background(
+                        if (isOdd) MaterialTheme.colorScheme.background
+                        else Color.LightGray.copy(alpha = 0.5f)
+                    )
                     .zIndex(offset?.let { 1f } ?: 0f)
                     .graphicsLayer {
                         translationY = offset ?: 0f
@@ -130,13 +142,9 @@ fun TasksList(
                     onEventSent
                 )
             } else {
-                TasksFiller()
-            }
-            if (index != items.size - 1) {
-                HorizontalDivider()
+                //TasksFiller()
             }
         }
-        item { HorizontalDivider() }
         item {
             TaskFiller(
                 modifier = Modifier,
