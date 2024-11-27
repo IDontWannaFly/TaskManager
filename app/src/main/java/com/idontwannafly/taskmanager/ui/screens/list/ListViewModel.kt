@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.idontwannafly.taskmanager.ui.base.BaseViewModel
 import com.idontwannafly.taskmanager.app.extensions.collect
+import com.idontwannafly.taskmanager.app.extensions.concurrentlist.ConcurrentList
 import com.idontwannafly.taskmanager.features.tasks.TasksUseCase
 import com.idontwannafly.taskmanager.features.tasks.dto.Task
 import kotlinx.coroutines.Job
@@ -16,7 +17,7 @@ class ListViewModel(
     private val useCase: TasksUseCase
 ) : BaseViewModel<ListContract.State, ListContract.Event, ListContract.Effect>() {
 
-    private val tasks = mutableListOf<Task>()
+    private val tasks = ConcurrentList<Task>(emptyList())
 
     private val tasksList: List<Task>
         get() = viewState.value.tasks
@@ -63,20 +64,20 @@ class ListViewModel(
 
     private fun updateItemsIndexes() {
         viewModelScope.launch {
-            updateTaskIndexes(tasks)
+            updateTaskIndexes(tasks.get())
         }
     }
 
     private fun moveItem(fromIdx: Int, toIdx: Int) {
         viewModelScope.launch {
-            val itemFrom = tasks[fromIdx]
-            val itemTo = tasks[toIdx]
+            val itemFrom = tasks.get(fromIdx)
+            val itemTo = tasks.get(toIdx)
             Log.d(TAG, "Move items: \n" +
                     "\tFrom: Index - $fromIdx; Item: $itemFrom;\n" +
                     "\tTo: Index - $toIdx; Item: $itemTo")
-            tasks[fromIdx] = itemTo
-            tasks[toIdx] = itemFrom
-            updateTasksList(tasks)
+            tasks.set(fromIdx,itemTo)
+            tasks.set(toIdx, itemFrom)
+            updateTasksList(tasks.get())
         }
     }
 
@@ -98,26 +99,26 @@ class ListViewModel(
         }
     }
 
-    private fun getSubtasks(parentTask: Task) {
+    private suspend fun getSubtasks(parentTask: Task) {
         val parentIndex = tasks.indexOf(parentTask)
         val job = viewModelScope.launch {
             useCase.getTasksFlow(parentTask.id).collect {
-                updateTask(parentIndex, parentTask.copy(subTasks = it))
+                updateTask(parentIndex, parentTask.copy(subTasks = it, isExpanded = true))
             }
         }
         subTasksCollections[parentTask.id!!] = job
     }
 
-    private fun clearSubtasks(parentTask: Task) {
+    private suspend fun clearSubtasks(parentTask: Task) {
         val parentIndex = tasks.indexOf(parentTask)
         subTasksCollections[parentTask.id!!]?.cancel()
         subTasksCollections.remove(parentTask.id)
-        updateTask(parentIndex, parentTask.copy(subTasks = emptyList()))
+        updateTask(parentIndex, parentTask.copy(subTasks = emptyList(), isExpanded = false))
     }
 
-    private fun updateTask(index: Int, taskToUpdate: Task) {
-        tasks[index] = taskToUpdate
-        updateTasksList(tasks)
+    private suspend fun updateTask(index: Int, taskToUpdate: Task) {
+        tasks.set(index, taskToUpdate)
+        updateTasksList(tasks.get())
     }
 
 }

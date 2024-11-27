@@ -3,7 +3,10 @@ package com.idontwannafly.taskmanager.ui.screens.list.composables
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -54,6 +57,7 @@ fun TasksList(
                 draggedItem.intValue = when {
                     near == -1 -> -1
                     draggedItem.intValue == -1 -> near
+                    near >= items.size -> draggedItem.intValue
                     else -> near.also {
                         val event = ListContract.Event.MoveItems(draggedItem.intValue, near)
                         onEventSent(event)
@@ -92,6 +96,10 @@ fun TasksList(
                     },
                     onDrag = { pic, offset ->
                         pic.consume()
+                        if (position.floatValue > (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.offset ?: 0)) {
+                            position.floatValue = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.offset?.toFloat() ?: position.floatValue
+                            return@detectDragGesturesAfterLongPress
+                        }
                         position.floatValue += offset.y
                     },
                     onDragEnd = {
@@ -135,15 +143,6 @@ fun TasksList(
                     onEventSent(event)
                 }
             )
-            if (task.subTasks.isNotEmpty()) {
-                TasksList(
-                    modifier = Modifier,
-                    task.subTasks,
-                    onEventSent
-                )
-            } else {
-                //TasksFiller()
-            }
         }
         item {
             TaskFiller(

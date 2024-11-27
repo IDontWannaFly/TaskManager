@@ -44,18 +44,12 @@ fun TaskItem(
         .clickable { onItemClicked(task) },
     verticalAlignment = Alignment.CenterVertically,
 ) {
-    val expanded by remember(task.subTasks.size) { mutableStateOf(task.subTasks.isNotEmpty()) }
-    val expandedIcon by remember {
-        derivedStateOf {
-            if (expanded) Icons.Default.KeyboardArrowDown
-            else Icons.AutoMirrored.Filled.KeyboardArrowRight
-        }
-    }
     Icon(
-        imageVector = expandedIcon,
+        imageVector = if (task.isExpanded) Icons.Default.KeyboardArrowDown
+        else Icons.AutoMirrored.Filled.KeyboardArrowRight,
         contentDescription = null,
         modifier = Modifier
-            .clickable { onExpanded(!expanded) }
+            .clickable { onExpanded(!task.isExpanded) }
             .padding(5.dp)
             .width(24.dp)
             .height(24.dp)

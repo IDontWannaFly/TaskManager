@@ -7,7 +7,8 @@ data class Task(
     val id: Long? = null,
     val name: String,
     val index: Int,
-    val subTasks: List<Task> = emptyList()
+    val subTasks: List<Task> = emptyList(),
+    val isExpanded: Boolean = false
 ) {
 
     companion object {
