@@ -97,7 +97,25 @@ fun EmptyListScreen(
 fun ListScreenPreview() = Surface(Modifier.fillMaxSize()) {
     val items = listOf(
         Task(name = "Simple task", index = 0),
-        Task(name = "Second task", index = 1)
+        Task(
+            name = "Second task",
+            index = 1,
+            subTasks = listOf(
+                Task(name = "Subtask 1", index = 0),
+                Task(
+                    name = "Subtask 2",
+                    index = 1,
+                    subTasks = listOf(
+                        Task(name = "Sub subtask 1", index = 0),
+                        Task(name = "Sub subtask 2", index = 1),
+                    ),
+                    isExpanded = true
+                ),
+                Task(name = "Subtask 3", index = 2)
+            ),
+            isExpanded = true
+        ),
+        Task(name = "Second task", index = 2, isExpanded = true),
     )
     ListScreen(
         ListContract.State(items),

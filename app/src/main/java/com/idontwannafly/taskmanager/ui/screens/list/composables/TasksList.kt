@@ -114,16 +114,16 @@ fun TasksList(
             val isOdd by remember {
                 mutableStateOf(index % 2 == 0)
             }
+        }
+        items.forEachIndexed { index, task ->
+            val isOdd = index % 2 == 0
             TaskItem(
-                modifier = Modifier
-                    .background(
-                        if (isOdd) MaterialTheme.colorScheme.background
-                        else Color.LightGray.copy(alpha = 0.5f)
-                    )
-                    .zIndex(offset?.let { 1f } ?: 0f)
-                    .graphicsLayer {
-                        translationY = offset ?: 0f
-                    },
+                modifier = Modifier,
+//                    .zIndex(offset?.let { 1f } ?: 0f)
+//                    .graphicsLayer {
+//                        translationY = offset ?: 0f
+//                    },
+                isOdd,
                 task = task,
                 onDeleteClicked = { taskToDelete ->
                     val event = ListContract.Event.RemoveTask(taskToDelete)
@@ -131,6 +131,10 @@ fun TasksList(
                 },
                 onItemClicked = {
                     val event = ListContract.Event.SelectTask(it)
+                    onEventSent(event)
+                },
+                addTaskAction = { name, parentId ->
+                    val event = ListContract.Event.AddTask(parentId, name)
                     onEventSent(event)
                 },
                 onExpanded = { isExpanded ->
@@ -142,7 +146,8 @@ fun TasksList(
         }
         item {
             TaskFiller(
-                modifier = Modifier,
+                modifier = Modifier
+                    .padding(start = 29.dp),
                 addTaskAction = { name ->
                     val event = ListContract.Event.AddTask(parentId = null, name = name)
                     onEventSent(event)

@@ -22,8 +22,7 @@ fun TaskFiller(modifier: Modifier = Modifier, addTaskAction: (name: String) -> U
         modifier = Modifier
             .then(modifier)
             .fillMaxWidth()
-            .padding(5.dp)
-            .padding(start = 29.dp),
+            .padding(5.dp),
         value = taskName.value,
         onValueChange = { taskName.value = it },
         keyboardActions = KeyboardActions(onDone = { addTaskAction(taskName.value) }),
